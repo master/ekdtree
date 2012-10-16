@@ -27,7 +27,8 @@ not_loaded(Line) ->
 new(_Points) ->
     ?NOT_LOADED.
 
--spec search(reference(), {float(), float(), float()}, integer()) -> [point()].
+-spec search(reference(), {float(), float(), float()}, integer()) -> 
+                    [{integer(), float()}].
 search(_Ref, _Point, _K) ->
     ?NOT_LOADED.
 

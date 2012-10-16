@@ -37,6 +37,7 @@ typedef CGAL::Search_traits_adapter<Point_key, Point_pmap, Traits_base> Traits;
 
 typedef CGAL::Orthogonal_k_neighbor_search<Traits> K_neighbor_search;
 typedef K_neighbor_search::Tree Tree;
+typedef K_neighbor_search::Distance Distance;
 
 typedef struct { Tree* tree; } thandle;
 
@@ -60,7 +61,6 @@ extern "C"
   ERL_NIF_INIT(ekdtree, nif_funcs, &on_load, NULL, NULL, NULL);
 };
 
-
 ERL_NIF_TERM ekdtree_new(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
   unsigned int list_size;
@@ -70,15 +70,15 @@ ERL_NIF_TERM ekdtree_new(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
   long point_id;
   double point_x, point_y, point_z;
 
-  std::vector<Point_3> points;
-  std::vector<Key> indices;
-
   ERL_NIF_TERM list = argv[0];
 
   if (!enif_get_list_length(env, list, &list_size)) 
     {
       return enif_make_badarg(env);    
     }
+
+  std::vector<Point_3> points;
+  std::vector<Key> indices;
 
   while (enif_get_list_cell(env, list, &head, &tail)) 
     {
@@ -112,11 +112,11 @@ ERL_NIF_TERM ekdtree_new(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 ERL_NIF_TERM ekdtree_search(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
   thandle* handle;
+
   double point_x, point_y, point_z;
   long K;
   int tuple_size;
   const ERL_NIF_TERM *tuple;
-  ERL_NIF_TERM result;
 
   if (enif_get_resource(env, argv[0], KDTREE_RESOURCE, (void**)&handle) &&
       enif_get_tuple(env, argv[1], &tuple_size, &tuple) &&
@@ -131,21 +131,22 @@ ERL_NIF_TERM ekdtree_search(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
       ERL_NIF_TERM list = enif_make_list(env, 0);
       
+      Distance tr_dist;
+  
       for(K_neighbor_search::iterator it = search.begin(); it != search.end(); it++) 
         {
           long point_id = boost::get<1>(it->first);
-          Point_3 point = boost::get<0>(it->first);
+          double distance = it->second;
 
           ERL_NIF_TERM id = enif_make_long(env, point_id);
-          ERL_NIF_TERM x = enif_make_double(env, point.x());
-          ERL_NIF_TERM y = enif_make_double(env, point.y());
-          ERL_NIF_TERM z = enif_make_double(env, point.z());
+          ERL_NIF_TERM dist = enif_make_double(env, distance);
 
-          ERL_NIF_TERM head = enif_make_tuple4(env, id, x, y, z);
+          ERL_NIF_TERM head = enif_make_tuple2(env, id, dist);
 
           list = enif_make_list_cell(env, head, list);
         }
-      
+
+      ERL_NIF_TERM result;
       enif_make_reverse_list(env, list, &result);
 
       return result;
