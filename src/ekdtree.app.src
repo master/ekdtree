@@ -1,0 +1,8 @@
+{application, ekdtree, [
+  {description, "Erlang k-d tree"},
+  {vsn, git},
+  {modules, [ekdtree]},
+  {registered, []},
+  {applications, [kernel, stdlib]},
+  {env, []}
+ ]}.
