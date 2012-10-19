@@ -31,7 +31,6 @@ Point_pmap::reference get(Point_pmap, Point_pmap::key_type p)
   return boost::get<0>(p);
 }
 
-typedef CGAL::Random_points_in_cube_3<Point_3> Random_points_iterator;
 typedef CGAL::Search_traits_3<Kernel> Traits_base;
 typedef CGAL::Search_traits_adapter<Point_key, Point_pmap, Traits_base> Traits;
 
