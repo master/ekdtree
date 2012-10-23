@@ -1,10 +1,10 @@
 %define realname ekdtree
-%define revision 3a1ea67e0649815bef1ca0b4695269aee937cbbc
+%define revision fbf7957f3309082007294f63cd4b142a4e01dd31
 %define install_dir %{_libdir}/erlang/lib/%{realname}-%{version}
 
 Name:          strikead-erlang-%{realname}
 Version:       0.1.0
-Release:       4
+Release:       5
 License:       Proprietary
 Vendor:        StrikeAd
 Packager:      Aleksey Morarash <aleksey.morarash@strikead.com>
