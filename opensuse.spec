@@ -4,7 +4,7 @@
 
 Name:          strikead-erlang-%{realname}
 Version:       0.1.0
-Release:       3
+Release:       4
 License:       Proprietary
 Vendor:        StrikeAd
 Packager:      Aleksey Morarash <aleksey.morarash@strikead.com>
@@ -12,8 +12,8 @@ Group:         Development/Languages/Erlang
 Source:        strikead-%{realname}.tar.gz
 Summary:       Erlang interface to CGAL k-d tree and k-NN search algorithm.
 URL:           https://github.com/strikead/%{realname}/tarball/%{revision}
-Requires:      erlang libcgal9
-BuildRequires: erlang erlang-rebar gcc-c++ libcgal-devel
+Requires:      erlang libcgal9 >= 4.0.2-8
+BuildRequires: erlang erlang-rebar gcc-c++ libcgal-devel >= 4.0.2-8
 BuildArch:     x86_64
 
 %description
