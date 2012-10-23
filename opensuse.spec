@@ -4,7 +4,7 @@
 
 Name:          strikead-erlang-%{realname}
 Version:       0.1.0
-Release:       2
+Release:       3
 License:       Proprietary
 Vendor:        StrikeAd
 Packager:      Aleksey Morarash <aleksey.morarash@strikead.com>

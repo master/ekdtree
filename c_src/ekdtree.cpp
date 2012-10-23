@@ -10,8 +10,6 @@
 #include "ekdtree.h"
 #include "erl_nif_compat.h"
 
-#define CGAL_DISABLE_ROUNDING_MATH_CHECK
-
 static ErlNifResourceType* KDTREE_RESOURCE;
 
 typedef long Key;
