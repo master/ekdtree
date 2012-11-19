@@ -1,6 +1,6 @@
 {application, ekdtree, [
   {description, "Erlang k-d tree"},
-  {vsn, "0.1.0"},
+  {vsn, "0.1.1"},
   {modules, [ekdtree]},
   {registered, []},
   {applications, []},
