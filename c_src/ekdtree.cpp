@@ -60,6 +60,13 @@ extern "C"
   ERL_NIF_INIT(ekdtree, nif_funcs, &on_load, NULL, NULL, NULL);
 };
 
+void debug(char* msg)
+{
+  std::time_t result = std::time(NULL);
+  std::cout << msg << " - ";
+  std::cout << std::asctime(std::localtime(&result));
+}
+
 ERL_NIF_TERM ekdtree_new(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
   unsigned int list_size;
@@ -102,6 +109,10 @@ ERL_NIF_TERM ekdtree_new(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
                                                          sizeof(thandle));
   handle->tree = new Tree(boost::make_zip_iterator(boost::make_tuple(points.begin(), indices.begin())),
                           boost::make_zip_iterator(boost::make_tuple(points.end(), indices.end())));
+
+  Point_3 query(0.0, 0.0, 0.0);
+  K_neighbor_search search(*handle->tree, query, 1);
+
   ERL_NIF_TERM result = enif_make_resource(env, handle);
   enif_release_resource_compat(env, handle);
 
@@ -126,6 +137,7 @@ ERL_NIF_TERM ekdtree_search(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
       enif_get_long(env, argv[2], &K))
     {
       Point_3 query(point_x, point_y, point_z);
+
       K_neighbor_search search(*handle->tree, query, K);
 
       ERL_NIF_TERM list = enif_make_list(env, 0);
@@ -181,6 +193,7 @@ void ekdtree_dtor(ErlNifEnv* env, void* arg)
 int on_load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info)
 {
   ErlNifResourceFlags flags = (ErlNifResourceFlags)(ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER);
+
   KDTREE_RESOURCE = enif_open_resource_type_compat(env, "kdtree_resource",
                                                    &ekdtree_dtor,
                                                    flags,
