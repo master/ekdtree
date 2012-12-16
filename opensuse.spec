@@ -3,7 +3,7 @@
 %define install_dir %{_libdir}/erlang/lib/%{realname}-%{version}
 
 Name:          strikead-erlang-%{realname}
-Version:       0.1.2
+Version:       0.1.3
 Release:       1
 License:       Proprietary
 Vendor:        StrikeAd
