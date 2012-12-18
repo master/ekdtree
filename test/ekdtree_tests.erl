@@ -17,6 +17,11 @@ size_test_() ->
     Size = ekdtree:size(Tree),
     [?_assertEqual(Size, length(?POINTS))].
 
+clear_test_() ->
+    {ok, Tree} = ekdtree:new(?POINTS),
+    Clear = ekdtree:clear(Tree),
+    [?_assertEqual(Clear, ok)].
+
 search_test_() ->
     {ok, Tree} = ekdtree:new(?POINTS),
     [?_assertEqual(ekdtree:search(Tree, {10.0, 10.0, 10.0}, 1), [{0, 0.0}]),

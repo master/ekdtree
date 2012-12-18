@@ -1,7 +1,7 @@
 -module(ekdtree).
 -author('oleg.smirnov@gmail.com').
 
--export([new/1, search/3, size/1]).
+-export([new/1, search/3, size/1, clear/1]).
 -on_load(init/0).
 
 -type point() :: {integer(), float(), float(), float()}.
@@ -34,4 +34,8 @@ search(_Ref, _Point, _K) ->
 
 -spec size(reference()) -> integer().
 size(_Ref) ->
+    ?NOT_LOADED.
+
+-spec clear(reference()) -> ok.
+clear(_Ref) ->
     ?NOT_LOADED.

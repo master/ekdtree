@@ -1,7 +1,5 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/basic.h>
-#include <CGAL/Search_traits.h>
-#include <CGAL/Search_traits_2.h>
 #include <CGAL/Search_traits_3.h>
 #include <CGAL/Search_traits_adapter.h>
 #include <CGAL/Orthogonal_k_neighbor_search.h>
@@ -38,17 +36,16 @@ typedef CGAL::Orthogonal_k_neighbor_search<Traits> K_neighbor_search;
 typedef K_neighbor_search::Tree Tree;
 typedef K_neighbor_search::Distance Distance;
 
-static ErlNifResourceType* KDTREE1;
-static ErlNifResourceType* KDTREE2;
-static ErlNifResourceType* KDTREE3;
+static ErlNifResourceType* KDTREE_RESOURCE;
 
-typedef struct { Tree* tree; } thandle3;
+typedef struct { Tree* tree; } thandle;
 
 extern "C"
 {
   ERL_NIF_TERM ekdtree_new(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]);
   ERL_NIF_TERM ekdtree_search(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]);
   ERL_NIF_TERM ekdtree_size(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]);
+  ERL_NIF_TERM ekdtree_clear(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[]);
 
   void ekdtree_dtor(ErlNifEnv* env, void* arg);
 
@@ -59,6 +56,7 @@ extern "C"
       {"new",           1, ekdtree_new},
       {"search",        3, ekdtree_search},
       {"size",          1, ekdtree_size},
+      {"clear",         1, ekdtree_clear},
     };
   
   ERL_NIF_INIT(ekdtree, nif_funcs, &on_load, NULL, NULL, NULL);
@@ -102,8 +100,8 @@ ERL_NIF_TERM ekdtree_new(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
         }
     }
 
-  thandle3* handle = (thandle3*)enif_alloc_resource_compat(env, KDTREE3,
-                                                           sizeof(thandle3));
+  thandle* handle = (thandle*)enif_alloc_resource_compat(env, KDTREE_RESOURCE,
+                                                           sizeof(thandle));
 
   handle->tree = new Tree(boost::make_zip_iterator(boost::make_tuple(points.begin(), indices.begin())),
                           boost::make_zip_iterator(boost::make_tuple(points.end(), indices.end())));
@@ -122,14 +120,14 @@ ERL_NIF_TERM ekdtree_new(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
 ERL_NIF_TERM ekdtree_search(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
-  thandle3* handle;
+  thandle* handle;
 
   double point_x, point_y, point_z;
   long K;
   int tuple_size;
   const ERL_NIF_TERM *tuple;
 
-  if (enif_get_resource(env, argv[0], KDTREE3, (void**)&handle) &&
+  if (enif_get_resource(env, argv[0], KDTREE_RESOURCE, (void**)&handle) &&
       enif_get_tuple(env, argv[1], &tuple_size, &tuple) &&
       tuple_size == 3 &&
       enif_get_double(env, tuple[0], &point_x) &&
@@ -171,9 +169,9 @@ ERL_NIF_TERM ekdtree_search(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 
 ERL_NIF_TERM ekdtree_size(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
-  thandle3* handle;
+  thandle* handle;
   
-  if (enif_get_resource(env, argv[0], KDTREE3, (void**)&handle))
+  if (enif_get_resource(env, argv[0], KDTREE_RESOURCE, (void**)&handle))
     {
       long result = handle->tree->size();
       return enif_make_long(env, result);
@@ -184,9 +182,24 @@ ERL_NIF_TERM ekdtree_size(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
     }
 }
 
+ERL_NIF_TERM ekdtree_clear(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
+{
+  thandle* handle;
+  
+  if (enif_get_resource(env, argv[0], KDTREE_RESOURCE, (void**)&handle))
+    {
+      handle->tree->clear();
+      return enif_make_atom(env, "ok");
+    }
+  else
+    {
+      return enif_make_badarg(env);
+    }
+}
+
 void ekdtree_dtor(ErlNifEnv* env, void* arg)
 {
-  thandle3* handle = (thandle3*)arg;
+  thandle* handle = (thandle*)arg;
 
   delete handle->tree;
 }
@@ -196,11 +209,10 @@ int on_load(ErlNifEnv* env, void** priv_data, ERL_NIF_TERM load_info)
   ErlNifResourceFlags flags = 
     (ErlNifResourceFlags)(ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER);
 
-  KDTREE1 = enif_open_resource_type_compat(env, "kdtree1", &ekdtree_dtor,
-                                           flags, 0);
-  KDTREE2 = enif_open_resource_type_compat(env, "kdtree2", &ekdtree_dtor,
-                                           flags, 0);
-  KDTREE3 = enif_open_resource_type_compat(env, "kdtree3", &ekdtree_dtor,
-                                           flags, 0);
+  KDTREE_RESOURCE = enif_open_resource_type_compat(env,
+                                                   "kdtree_resource",
+                                                   &ekdtree_dtor,
+                                                   flags,
+                                                   0);
   return 0;
 }
