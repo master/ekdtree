@@ -1,14 +1,15 @@
 %define realname ekdtree
-%define revision fbf7957f3309082007294f63cd4b142a4e01dd31
+%define revision {{REVISION}}
+
 %define install_dir %{_libdir}/erlang/lib/%{realname}-%{version}
 
 Name:          strikead-erlang-%{realname}
-Version:       0.2.0
-Release:       1
+Version:       {{VERSION}}
+Release:       {{RELEASE}}
 License:       Proprietary
 Vendor:        StrikeAd
 Packager:      Aleksey Morarash <aleksey.morarash@strikead.com>
-Group:         Development/Languages/Erlang
+Group:         StrikeAd/Software
 Source:        strikead-%{realname}.tar.gz
 Summary:       Erlang interface to CGAL k-d tree and k-NN search algorithm.
 URL:           https://github.com/strikead/%{realname}/tarball/%{revision}
@@ -23,7 +24,7 @@ Erlang interface to CGAL k-d tree and k-NN search algorithm.
 %setup -n strikead-%{realname}-%{revision}
 
 %build
-rebar compile
+rebar -vv compile
 
 %install
 install --mode=755 --directory %{buildroot}%{install_dir}/ebin

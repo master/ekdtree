@@ -1,4 +1,9 @@
-REBAR=`PATH=".:$$PATH" which rebar`
+PROJECT=ekdtree
+VERSION=`cat version`
+RELEASE=`cat release`
+REVISION=`git --no-pager log --max-count=1 --format=format:%H`
+
+REBAR=rebar
 
 .PHONY: all test clean build
 
@@ -17,3 +22,9 @@ dialyze: deps compile
 	-Werror_handling \
 	-Wno_undefined_callbacks \
 	-Wrace_conditions
+spec:
+	cat opensuse.spec.in | \
+		sed "s/{{VERSION}}/$(VERSION)/" | \
+		sed "s/{{RELEASE}}/$(RELEASE)/" | \
+		sed "s/{{REVISION}}/$(REVISION)/" \
+		> strikead-$(PROJECT).spec
